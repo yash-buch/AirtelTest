@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         screenHeight = dm.heightPixels;
         screenWidth = dm.widthPixels;
         Log.i(TAG, "screen width: "+screenWidth);
-        RecyclerView rv = findViewById(R.id.rv);
+        final RecyclerView rv = findViewById(R.id.rv);
         LinearLayoutManager lm = new LinearLayoutManager(this, VERTICAL, false);
         rv.setLayoutManager(lm);
         final CustomAdapter adapter = new CustomAdapter(getRVItemPairs(3));
@@ -49,11 +49,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String str = et.getText().toString();
                 try {
-                    adapter.rows = getRVItemPairs(Integer.parseInt(str));
+                    rv.setAdapter(new CustomAdapter(getRVItemPairs(Integer.parseInt(str))));
                 } catch (NumberFormatException e) {
-                    adapter.rows = getRVItemPairs(3);
+                    rv.setAdapter(new CustomAdapter(getRVItemPairs(3)));
                 }
-                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -73,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 View v = new View(MainActivity.this);
                 v.setLayoutParams(new LinearLayout.LayoutParams(frameWidth, screenHeight/10));
+                Log.i(TAG, "frameWidth assigned:"+frameWidth);
                 row.viewList.add(v);
                 sw -= frameWidth;
                 frameNum++;
@@ -87,9 +87,14 @@ public class MainActivity extends AppCompatActivity {
 
     class CustomAdapter extends RecyclerView.Adapter<CustomViewHolder> {
 
-        List<Row> rows;
+        List<Row> mRows;
         public CustomAdapter(List<Row> rows) {
-            this.rows = rows;
+            this.mRows = rows;
+        }
+
+        public void updateData(List<Row> rows) {
+            this.
+            mRows = rows;
         }
 
         @NonNull
@@ -101,13 +106,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
-            List<View> views = rows.get(position).viewList;
+            List<View> views = mRows.get(position).viewList;
+            holder.ll.removeAllViews();
             for(int i = 0; i < views.size(); i++) {
                 View v = views.get(i);
                 if(i%2 == 0) {
                     v.setBackgroundColor(Color.BLACK);
                 } else {
-                    v.setBackgroundColor(Color.WHITE);
+                    v.setBackgroundColor(Color.LTGRAY);
                 }
                 holder.ll.addView(v);
             }
@@ -115,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return rows.size();
+            return mRows.size();
         }
     }
 
